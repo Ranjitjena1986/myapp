@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { AuthService } from '../service/auth.service';
 
 @Component({
   selector: 'app-signup',
@@ -8,16 +10,16 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 })
 export class SignupComponent implements OnInit {
 
-  isLoading:false;
+  isLoading = false;
+  private authStatusSub: Subscription;  
   form:FormGroup;
   fullname:FormControl;
   email:FormControl;
   password:FormControl;
 
-  constructor() { }
+  constructor(private authService:AuthService) { }
 
   ngOnInit() {
-
     this.form = new FormGroup({
       fullname: new FormControl('', { validators: [Validators.required] }),
       email: new FormControl('', [
@@ -30,32 +32,20 @@ export class SignupComponent implements OnInit {
       ])     
     });
 
-    //this.createFormControls();
-  }
-
-  /*createFormControls() {
-    this.fullname = new FormControl('', Validators.required);
-    this.email = new FormControl('', [
-      Validators.required,
-      Validators.pattern("[^ @]*@[^ @]*")
-    ]);
-    this.password = new FormControl('', [
-      Validators.required,
-      Validators.minLength(8)
-    ]);
-    this.createForm();
-  }
-
-  createForm() {
-    this.form = new FormGroup({
-      fullname: this.fullname,
-      email: this.email,
-      password: this.password   
-    });
-  }*/
+    this.authStatusSub = this.authService.getAuthStatusListener().subscribe(
+      authStatus => {
+        this.isLoading = false;
+      }
+    );
+  } 
 
   onSignup(){
-    console.log(this.form);
+    this.isLoading = true;
+    this.authService.createUser(this.form.value.fullname, this.form.value.email, this.form.value.password);
+  }
+
+  ngOnDestroy() {
+    this.authStatusSub.unsubscribe();
   }
 
 }

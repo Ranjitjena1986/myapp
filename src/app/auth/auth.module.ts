@@ -12,7 +12,7 @@ import { AngularMaterialModule } from '../angular-material.module';
     ReactiveFormsModule,
     FormsModule,
     AuthRoutingModule,
-    AngularMaterialModule
+    AngularMaterialModule    
   ],
   declarations: [LoginComponent, SignupComponent]
 })
